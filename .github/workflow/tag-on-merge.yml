@@ -1,0 +1,38 @@
+name: Tag New Release on Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump-version-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Bump patch version and create tag
+        run: |
+          CURRENT_VERSION=$(grep "__version__" your_package/__init__.py | cut -d '"' -f2)
+          echo "Current version: $CURRENT_VERSION"
+
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          PATCHED_VERSION="$major.$minor.$((patch + 1))"
+          echo "New version: $PATCHED_VERSION"
+
+          sed -i "s/__version__ = \".*\"/__version__ = \"$PATCHED_VERSION\"/" your_package/__init__.py
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Bump version to $PATCHED_VERSION"
+          git tag "v$PATCHED_VERSION"
+          git push origin main --follow-tags
+        
