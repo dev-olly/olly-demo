@@ -27,6 +27,8 @@ jobs:
           CURRENT_VERSION=$(grep "version = " pyproject.toml | cut -d '=' -f2 | tr -d '"')
           echo "Current version: $CURRENT_VERSION"
 
+          CURRENT_VERSION=$(echo $CURRENT_VERSION | tr -d ' ')
+        
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
           PATCHED_VERSION="$major.$minor.$((patch + 1))"
           echo "New version: $PATCHED_VERSION"
