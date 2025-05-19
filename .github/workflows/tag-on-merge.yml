@@ -24,14 +24,14 @@ jobs:
 
       - name: Bump patch version and create tag
         run: |
-          CURRENT_VERSION=$(grep "__version__" your_package/__init__.py | cut -d '"' -f2)
+          CURRENT_VERSION=$(grep "version = " pyproject.toml | cut -d '=' -f2 | tr -d '"')
           echo "Current version: $CURRENT_VERSION"
 
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
           PATCHED_VERSION="$major.$minor.$((patch + 1))"
           echo "New version: $PATCHED_VERSION"
 
-          sed -i "s/__version__ = \".*\"/__version__ = \"$PATCHED_VERSION\"/" your_package/__init__.py
+          sed -i "s/version = \".*\"/version = \"$PATCHED_VERSION\"/" pyproject.toml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "Bump version to $PATCHED_VERSION"
